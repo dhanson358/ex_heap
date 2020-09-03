@@ -32,7 +32,6 @@ Then configure the `ex_heap` app per environment like so:
 ```elixir
 config :ex_heap,
   app_id: "123456789", # required
-  token: "my_token", # required
   httpoison: [recv_timeout: 5000, timeout: 8000] # optional
 ```
 
@@ -40,8 +39,7 @@ You may also use environment variables:
 
 ``` elixir
 config :ex_heap,
-  app_id: {:system, "HEAP_APP_ID"},
-  token: {:system, "HEAP_TOKEN"}
+  app_id: {:system, "HEAP_APP_ID"}
 ```
 
 

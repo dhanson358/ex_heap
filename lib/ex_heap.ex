@@ -50,12 +50,14 @@ defmodule ExHeap do
 
   """
   def track(identity, event, properties \\ %{}) do
+    {:ok, datetime} = DateTime.now("Etc/UTC")
+
     %{
       "app_id" => get_config!(:app_id),
       "events" => [
         %{
           "identity" => identity,
-          "timestamp" => "here",
+          "timestamp" => datetime |> DateTime.to_iso8601(),
           "event" => event,
           "properties" => properties
         }
@@ -90,22 +92,19 @@ defmodule ExHeap do
   defp add_user_properties_url(), do: "#{@root_url}/add_user_properties"
 
   defp post(data, url) do
-    token = get_config!(:token)
-
     headers =
       %{
-        "Authorization" => "Bearer #{token}",
         "Content-type" => "application/json"
       }
       |> Map.to_list()
 
     options = Application.get_env(:ex_heap, :httpoison, [])
 
-    HTTPoison.request(:post, url, data, headers, options)
+    HTTPoison.request(:post, url, Poison.encode!(data), headers, options)
   end
 
   defp get_config(key, default \\ nil) when is_atom(key) do
-    case Application.fetch_env(:stripy, key) do
+    case Application.fetch_env(:ex_heap, key) do
       {:ok, {:system, env_var}} -> System.get_env(env_var)
       {:ok, value} -> value
       :error -> default
